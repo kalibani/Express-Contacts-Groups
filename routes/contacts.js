@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-
 const modelContacts = require('../models/contacts');
 
 router.get('/', (req, res)=>{
   modelContacts.findAll()
-  .then(rowsContacts=>{
+  .then((rowsContacts)=>{
     res.render('contacts', { dataContacts : rowsContacts, title : 'Halaman Contacts'})
   })
   .catch(err =>{

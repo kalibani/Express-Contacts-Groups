@@ -1,57 +1,66 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('db/data.db');
-const modelContacts = require('../models/contacts');
 
 class ModelProfiles {
 
-  static findAll(callback){
-    db.all(`SELECT * FROM  contacts C JOIN  profiles P ON C.id = P.idContacts`,(err, rowsProfiles)=>{
-      modelContacts.findAll((rowsContacts)=>{
+  static findAll(){
+    return new Promise(function(resolve, reject) {
+      db.all(`SELECT * FROM  contacts C JOIN  profiles P ON C.id = P.idContacts`,(err, rowsProfiles)=>{
         if (!err) {
-          callback(err, rowsProfiles, rowsContacts)
+          resolve(rowsProfiles)
         }else {
-          console.log(err);
+          reject(err)
         }
       })
     })
   }
 
-  static createProfiles(body, callback){
-    db.run(`INSERT INTO profiles (username, password, idContacts) VALUES ('${body.username}','${body.password}','${body.idContacts}')`,(err)=>{
-      if (!err) {
-        callback()
-      }else {
-        callback(err)
-      }
-    })
-  }
-
-  static findByid(params, callback){
-    db.all(`SELECT * FROM contacts C JOIN profiles P ON C.id = P.idContacts WHERE P.id = ${params}`, (err, rowsProfiles)=>{
-      modelContacts.findAll((rowsContacts)=>{
-        if (!err) {
-          callback(err, rowsProfiles, rowsContacts)
+  static createProfiles(body){
+    return new Promise(function(resolve, reject) {
+      db.run(`INSERT INTO profiles (username, password, idContacts) VALUES ('${body.username}','${body.password}','${body.idContacts}')`,(err)=>{
+        if(!err) {
+          resolve()
         }else {
-          console.log(err);
+          reject(err)
         }
       })
     })
   }
 
-  static UpdateProfiles(body, params, callback){
-    db.run(`UPDATE profiles SET username = '${body.username}', password = '${body.password}', idContacts = '${body.idContacts}'
-      WHERE id = ${params}`, (err) => {
+  static findByid(params){
+    return new Promise(function(resolve, reject) {
+      db.all(`SELECT * FROM contacts C JOIN profiles P ON C.id = P.idContacts WHERE P.id = ${params}`, (err, rowsProfiles)=>{
         if (!err) {
-          callback()
+          resolve(rowsProfiles)
         }else {
-          callback(err)
+          reject(err);
         }
+      })
     })
   }
 
-  static deleteProfiles(params, callback){
-    db.run(`DELETE FROM profiles WHERE id = ${params}`, () => {
-      callback()
+  static UpdateProfiles(body, params){
+    return new Promise(function(resolve, reject) {
+      db.run(`UPDATE profiles SET username = '${body.username}', password = '${body.password}', idContacts = '${body.idContacts}'
+        WHERE id = ${params}`, (err) => {
+        if (!err) {
+          resolve()
+        }else {
+          reject(err)
+        }
+      })
+    })
+  }
+
+  static deleteProfiles(params){
+    return new Promise(function(resolve, reject) {
+      db.run(`DELETE FROM profiles WHERE id = ${params}`, (err) => {
+        if (!err) {
+          resolve()
+        }else {
+          reject(err)
+        }
+      })
     })
   }
 
